@@ -40,7 +40,7 @@ object CasbahBuild extends Build {
    */
   lazy val scalacOptionsSettings = Seq(scalacOptions ++= (scalaBinaryVersion.value match {
     case "2.10" => Seq("-unchecked", "-feature", "-Xlint")
-    case _ => Seq("-unchecked", "-feature", "-Xlint:-missing-interpolator")
+    case _ => Seq("-unchecked", "-deprecation", "-feature", "-Xlint:-missing-interpolator")
   }))
 
   /*

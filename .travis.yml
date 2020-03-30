@@ -1,0 +1,62 @@
+# See http://about.travis-ci.org/docs/user/build-configuration/
+language: scala
+scala:
+  - 2.12.1
+  - 2.11.8
+  - 2.10.5
+jdk:
+  - openjdk7
+  - openjdk8
+
+addons:
+  # Fix OpenJDK build. Issue: https://github.com/travis-ci/travis-ci/issues/5227
+  hostname: short-hostname
+
+# Branches to test
+branches:
+  only:
+    - master
+    - 3.6.x
+notifications:
+  email:
+    recipients:
+      - raulrodriguez782@gmail.com
+    on_success: change
+    on_failure: always
+
+matrix:
+  fast_finish: true
+  exclude:
+    - scala: 2.12.1
+      jdk: openjdk7
+
+env:
+  global:
+    - MONGO_REPO="http://repo.mongodb.com/apt/ubuntu"
+    - REPO_TYPE="xenial/mongodb-enterprise/3.6 multiverse"
+    - SOURCES_LOC="/etc/apt/sources.list.d/mongodb-enterprise.list"
+    - KEY_SERVER="hkp://keyserver.ubuntu.com:80"
+    - MONGOD_PARAMS="--setParameter=enableTestCommands=1"
+    - MONGOD_OPTS="--dbpath ./data --fork --logpath mongod.log ${MONGOD_PARAMS}"
+    - TERM=dumb
+
+before_install:
+  # MongoDB Enterprise Edition 3.6
+  - sudo apt-get install libcurl3 libgssapi-krb5-2 libkrb5-dbg libldap-2.4-2 libpci3 libwrap0 libsasl2-2 libsensors4 snmp openssl
+  - sudo apt-get remove mongodb
+  - wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.6.16.tgz
+  - tar -zxvf mongodb-linux-x86_64-ubuntu1604-3.6.16.tgz
+  - sudo mkdir -p data
+  # Update all the repositories
+  - sudo apt-get update -qq
+
+install:
+  # Install MongoDB Enterprise
+  - sudo cp mongodb-linux-x86_64-ubuntu1604-3.6.16/bin/* /usr/bin/
+
+before_script:
+  - sudo mongod ${MONGOD_OPTS}
+
+script:
+  - ./sbt ++$TRAVIS_SCALA_VERSION test
+
