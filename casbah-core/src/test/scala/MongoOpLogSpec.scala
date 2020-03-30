@@ -40,7 +40,8 @@ class MongoOpLogSpec extends CasbahDBTestSpecification with Mockito {
         "v" -> 2,
         "op" -> "n",
         "ns" -> "",
-        "o" -> Map.empty)
+        "o" -> Map.empty
+      )
 
       cursor.next() returns x
 
@@ -74,7 +75,8 @@ class MongoOpLogSpec extends CasbahDBTestSpecification with Mockito {
       val oplog =
         new MongoOpLog(
           mongoClient = mongoClient,
-          namespace = Some("%s.%s".format(database.name, collection.name)))
+          namespace = Some("%s.%s".format(database.name, collection.name))
+        )
 
       var latest = false
       while (!latest && oplog.hasNext) {
